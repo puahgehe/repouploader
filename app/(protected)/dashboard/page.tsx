@@ -16,13 +16,6 @@ export default async function DashboardPage() {
     where: { userId: session.userId },
     orderBy: { createdAt: "desc" },
     take: 5,
-    select: {
-      id: true,
-      repoFullName: true,
-      repoUrl: true,
-      status: true,
-      createdAt: true,
-    },
   });
 
   const totalJobs = await prisma.uploadJob.count({
