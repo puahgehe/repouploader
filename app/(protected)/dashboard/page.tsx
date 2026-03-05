@@ -133,7 +133,7 @@ export default async function DashboardPage() {
             </Link>
           </div>
           <div className="space-y-3">
-            {recentJobs.map((job) => (
+            {recentJobs.map((job: { id: string; repoFullName: string; repoUrl: string; status: string; createdAt: Date }) => (
               <Card key={job.id}>
                 <CardContent className="py-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">

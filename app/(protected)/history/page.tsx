@@ -68,7 +68,7 @@ export default async function HistoryPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {jobs.map((job) => (
+                {jobs.map((job: { id: string; repoFullName: string; repoUrl: string; status: string; createdAt: Date; finishedAt: Date | null; errorMessage: string | null; log: string }) => (
                   <TableRow key={job.id}>
                     <TableCell className="font-medium">
                       {job.repoFullName}
