@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { exchangeCodeForToken, getGitHubUser } from "@/lib/github";
 import { createSession, setSessionCookie } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { getGitHubOAuthConfig } from "@/lib/settings";
 
 export const runtime = "nodejs";
 
@@ -17,8 +18,16 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Load OAuth credentials from database (or env fallback)
+    const config = await getGitHubOAuthConfig();
+    if (!config) {
+      return NextResponse.redirect(
+        `${process.env.NEXTAUTH_URL || ""}/setup?error=not_configured`
+      );
+    }
+
     // Exchange code for token (token never exposed to client)
-    const { access_token } = await exchangeCodeForToken(code);
+    const { access_token } = await exchangeCodeForToken(code, config);
 
     // Fetch GitHub user info
     const ghUser = await getGitHubUser(access_token);

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getGitHubOAuthConfig } from "@/lib/settings";
 
 const GITHUB_SCOPES = "repo,user:email,read:user";
 // Scope explanation:
@@ -9,17 +10,15 @@ const GITHUB_SCOPES = "repo,user:email,read:user";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  if (!clientId) {
-    return NextResponse.json(
-      { error: "GitHub OAuth not configured" },
-      { status: 500 }
-    );
+  const config = await getGitHubOAuthConfig();
+  if (!config) {
+    // OAuth not configured, redirect to setup page
+    return NextResponse.redirect(new URL("/setup", process.env.NEXTAUTH_URL || "http://localhost:3000"));
   }
 
   const params = new URLSearchParams({
-    client_id: clientId,
-    redirect_uri: process.env.GITHUB_CALLBACK_URL || "",
+    client_id: config.clientId,
+    redirect_uri: config.callbackUrl,
     scope: GITHUB_SCOPES,
     state: crypto.randomUUID(), // CSRF protection (simple stateless)
   });

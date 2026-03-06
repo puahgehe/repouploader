@@ -10,13 +10,21 @@ import {
   Github,
   ArrowRight,
   CheckCircle2,
+  Settings,
 } from "lucide-react";
+import { isOAuthConfigured } from "@/lib/settings";
 
-export default function LandingPage({
+export default async function LandingPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  let oauthConfigured = false;
+  try {
+    oauthConfigured = await isOAuthConfigured();
+  } catch {
+    // Database not ready yet, treat as not configured
+  }
   const features = [
     {
       icon: Upload,
@@ -68,6 +76,23 @@ export default function LandingPage({
           </Link>
         </div>
       </header>
+
+      {/* Setup banner if OAuth not configured */}
+      {!oauthConfigured && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-400">
+              <Settings className="w-4 h-4 shrink-0" />
+              <span>GitHub OAuth is not configured yet. Set it up to enable login.</span>
+            </div>
+            <Link href="/setup">
+              <Button size="sm" variant="outline" className="shrink-0">
+                Configure
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <section className="py-20 px-4 text-center">
